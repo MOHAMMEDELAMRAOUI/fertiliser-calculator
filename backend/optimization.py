@@ -47,6 +47,8 @@ def calculate_formulation(target, available_ingredients):
         's': np.array([ing['sulfur'] for ing in ingredients_data], dtype=float),
     }
 
+   
+
     def objective(x):
         error = 0.0
         for nutrient, target_value in target.items():

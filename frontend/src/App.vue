@@ -3,7 +3,7 @@
     <h1>Formulation d'engrais (N, P₂O₅, K₂O, S)</h1>
 
     <section class="card">
-      <h2>1) Ingrédients disponibles</h2>
+      <h2>Ingrédients disponibles</h2>
       <div class="actions">
         <button @click="loadIngredients" :disabled="loading">{{ loading ? 'Chargement...' : 'Recharger' }}</button>
         <label>
@@ -18,7 +18,7 @@
     </section>
 
     <section class="card">
-      <h2>2) Cibles</h2>
+      <h2>Cibles</h2>
       <TargetForm v-model:target="target" />
       <button class="primary" @click="calculate" :disabled="!canCalculate || submitting">
         {{ submitting ? 'Calcul en cours...' : 'Lancer le calcul' }}
@@ -27,7 +27,7 @@
     </section>
 
     <section v-if="result" class="card">
-      <h2>3) Résultats</h2>
+      <h2>Résultats</h2>
       <ResultsTable :result="result" />
       <ContributionChart :target="target" :result="result" />
     </section>
