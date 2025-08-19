@@ -2,10 +2,26 @@
   <div class="container">
     <h1>Formulation d'engrais (N, P₂O₅, K₂O, S)</h1>
 
+    <!-- Sélection de la page (NPK / NPK-S) -->
+    <div>
+      <select v-model="selectedPage">
+        <option :value="1">NPK</option>
+        <option :value="2">NPK-S</option>
+      </select>
+    </div>
+
+    <ul>
+      <li v-for="ing in ingredients" :key="ing.id">
+        {{ ing.name }} (N: {{ ing.nitrogen_percent }} P: {{ ing.phosphorus_percent }} K: {{ ing.potassium_percent }} S: {{ ing.sulfur_percent }})
+      </li>
+    </ul>
+
     <section class="card">
       <h2>Ingrédients disponibles</h2>
       <div class="actions">
-        <button @click="loadIngredients" :disabled="loading">{{ loading ? 'Chargement...' : 'Recharger' }}</button>
+        <button @click="loadIngredients" :disabled="loading">
+          {{ loading ? 'Chargement...' : 'Recharger' }}
+        </button>
         <label>
           <input type="checkbox" v-model="onlyAvailable" /> N'afficher que disponibles
         </label>
@@ -50,22 +66,26 @@ const submitting = ref(false)
 const error = ref('')
 const result = ref(null)
 
+const selectedPage = ref(1) // NPK par défaut
 const target = ref({ n: 10, p2o5: 10, k2o: 10, s: 5 })
 const canCalculate = ref(false)
 
+// Filtrage des ingrédients disponibles
 const filteredIngredients = computed(() =>
   ingredients.value.filter(i => (onlyAvailable.value ? i.is_available : true))
 )
 
+// Activation du bouton calcul
 watch([selectedIds, target], () => {
   canCalculate.value = selectedIds.value.length > 0
 }, { deep: true })
 
+// Recharge les ingrédients depuis le backend
 async function loadIngredients() {
   loading.value = true
   error.value = ''
   try {
-    const { data } = await api.get('/api/ingredients')
+    const { data } = await api.get('/api/ingredients', { params: { page_id: selectedPage.value } })
     ingredients.value = data
   } catch (e) {
     error.value = e?.response?.data?.error || e.message
@@ -74,6 +94,12 @@ async function loadIngredients() {
   }
 }
 
+// Rechargement automatique si page change
+watch(selectedPage, () => {
+  loadIngredients()
+})
+
+// Calcul de la formulation
 async function calculate() {
   if (!canCalculate.value) return
   submitting.value = true
@@ -89,6 +115,7 @@ async function calculate() {
   }
 }
 
+// Chargement initial
 onMounted(loadIngredients)
 </script>
 

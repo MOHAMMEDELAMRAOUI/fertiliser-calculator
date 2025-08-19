@@ -33,6 +33,7 @@ def init_db():
             potassium_percent NUMERIC NOT NULL CHECK (potassium_percent >= 0 AND potassium_percent <= 100),
             sulfur_percent NUMERIC NOT NULL CHECK (sulfur_percent >= 0 AND sulfur_percent <= 100),
             is_available BOOLEAN NOT NULL DEFAULT TRUE,
+            page_id INTEGER NOT NULL DEFAULT 1,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
             updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );

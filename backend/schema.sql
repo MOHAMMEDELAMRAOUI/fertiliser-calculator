@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS ingredients (
   phosphorus_percent NUMERIC NOT NULL CHECK (phosphorus_percent BETWEEN 0 AND 100),
   potassium_percent NUMERIC NOT NULL CHECK (potassium_percent BETWEEN 0 AND 100),
   sulfur_percent NUMERIC NOT NULL CHECK (sulfur_percent BETWEEN 0 AND 100),
+  page_id INTEGER NOT NULL DEFAULT 1,
   is_available BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()

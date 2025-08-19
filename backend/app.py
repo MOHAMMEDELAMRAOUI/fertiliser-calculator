@@ -27,6 +27,7 @@ def _json_error(msg, code=400):
 # GET /api/ingredients - Liste tous les ingrédients
 @app.route('/api/ingredients', methods=['GET'])
 def get_ingredients():
+    page_id = request.args.get('page_id', default=1, type=int)
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     try:
@@ -36,9 +37,11 @@ def get_ingredients():
                    nitrogen_percent, phosphorus_percent,
                    potassium_percent, sulfur_percent,
                    is_available, created_at, updated_at
-            FROM ingredients
+            FROM ingredients 
+            WHERE page_id = %s
             ORDER BY name
-            """
+            """,
+            (page_id, )
         )
         rows = cur.fetchall()
         return jsonify(rows)
@@ -51,7 +54,7 @@ def get_ingredients():
 @app.route('/api/ingredients', methods=['POST'])
 def create_ingredient():
     data = request.get_json() or {}
-    required = ['code','name','nitrogen_percent','phosphorus_percent','potassium_percent','sulfur_percent']
+    required = ['code','name','nitrogen_percent','phosphorus_percent','potassium_percent','sulfur_percent', 'page_id']
     if not all(k in data for k in required):
         return _json_error("Missing required fields", 400)
 
@@ -59,14 +62,15 @@ def create_ingredient():
     try:
         cur.execute(
             """
-            INSERT INTO ingredients (code, name, nitrogen_percent, phosphorus_percent, potassium_percent, sulfur_percent)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING id, code, name, nitrogen_percent, phosphorus_percent, potassium_percent, sulfur_percent, is_available
+            INSERT INTO ingredients (code, name, nitrogen_percent, phosphorus_percent, potassium_percent, sulfur_percent, page_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            RETURNING id, code, name, nitrogen_percent, phosphorus_percent, potassium_percent, sulfur_percent, page_id , is_available
             """,
             (
                 data['code'], data['name'],
                 float(data['nitrogen_percent']), float(data['phosphorus_percent']),
-                float(data['potassium_percent']), float(data['sulfur_percent'])
+                float(data['potassium_percent']), float(data['sulfur_percent']),
+                data.get('page_id', 1) 
             )
         )
         row = cur.fetchone(); conn.commit()
@@ -90,14 +94,16 @@ def update_ingredient(id:int):
                 phosphorus_percent = %s,
                 potassium_percent = %s,
                 sulfur_percent = %s,
+                page_id = %s,
                 updated_at = %s
             WHERE id = %s
-            RETURNING id, code, name, nitrogen_percent, phosphorus_percent, potassium_percent, sulfur_percent, is_available, updated_at
+            RETURNING id, code, name, nitrogen_percent, phosphorus_percent, potassium_percent, sulfur_percent, is_available, page_id , updated_at
             """,
             (
                 data.get('code'), data.get('name'),
                 float(data.get('nitrogen_percent')), float(data.get('phosphorus_percent')),
                 float(data.get('potassium_percent')), float(data.get('sulfur_percent')),
+                int(data['page_id']),
                 datetime.utcnow(), id
             )
         )
@@ -125,7 +131,7 @@ def toggle_availability(id:int):
             UPDATE ingredients
             SET is_available = %s, updated_at = %s
             WHERE id = %s
-            RETURNING id, code, name, is_available, updated_at
+            RETURNING id, code, name, is_available, page_id , updated_at
             """,
             (new_status, datetime.utcnow(), id)
         )
@@ -154,3 +160,5 @@ def calculate_formulation_endpoint():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+
