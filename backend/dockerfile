@@ -1,0 +1,22 @@
+# Image Python officielle
+FROM python:3.12-slim
+
+# Variables d'environnement
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Créer et définir le répertoire de travail
+WORKDIR /app
+
+# Copier requirements et installer
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier tout le backend
+COPY . .
+
+# Exposer le port Flask
+EXPOSE 5000
+
+# Commande pour lancer Flask
+CMD ["python", "app.py"]
