@@ -1,0 +1,81 @@
+# Version control
+.git/
+.gitignore
+.svn/
+.hg/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+*.cover
+*.egg-info/
+*.eggs/
+dist/
+build/
+*.a
+*.mat
+*.sav
+*.h
+*.f90
+
+# Node.js artifacts
+node_modules/
+npm-debug.log
+yarn-debug.log
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+out/
+tmp/
+temp/
+*.tmp
+
+# Test files and folders
+test/
+tests/
+*_test.go
+*.test
+
+# Debug and log files
+debug/
+*.log
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+.local/
+local/
+
+# Documentation and markdown
+docs/
+*.md
+README*
+
+# Docker files (ignore only at root, not service Dockerfiles)
+docker-compose*
+
+# Project-specific
+frontend/fertiliser/.vscode/
+frontend/fertiliser/node_modules/
+
+# Temporary and miscellaneous
+*.tmp
+
+# Exclude lock files and build tool wrappers (do NOT ignore these)
+# (Intentionally not ignoring *.lock, .mvnw, .gradlew, .mvn/, .gradle/)
+
+# End of .dockerignore

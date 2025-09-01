@@ -1,0 +1,43 @@
+services:
+  python-backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile   # <-- ici majuscule
+    restart: unless-stopped
+    init: true
+    env_file: ./backend/.env
+    ports:
+      - "5000:5000"
+    networks:
+      - appnet
+    depends_on:
+      - db
+
+  js-fertiliser:
+    build:
+      context: ./frontend/fertiliser
+      dockerfile: dockerfile   # <-- pareil, majuscule
+    restart: unless-stopped
+    init: true
+    ports:
+      - "80:80"
+    networks:
+      - appnet
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: elamraoui
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ocpdb
+    ports:
+      - "5432:5432"
+    networks:
+      - appnet
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+
+networks:
+  appnet:
+    driver: bridge

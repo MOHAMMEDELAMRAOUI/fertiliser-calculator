@@ -1,0 +1,11 @@
+name: ocp-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pyomo
+  - ipopt
+  - pip
+  - pip:
+      - -r requirements.txt
+

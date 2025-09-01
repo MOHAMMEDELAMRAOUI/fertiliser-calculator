@@ -1,22 +1,24 @@
-# Image Python officielle
-FROM python:3.12-slim
+FROM continuumio/miniconda3
 
-# Variables d'environnement
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Créer et définir le répertoire de travail
 WORKDIR /app
 
-# Copier requirements et installer
+# Copie les fichiers nécessaires pour créer l'environnement
+COPY environment.yml .
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier tout le backend
+# Crée l'environnement Conda
+RUN conda env create -f environment.yml && conda clean -afy
+
+# Définit le shell par défaut pour utiliser l'environnement
+SHELL ["conda", "run", "-n", "ocp-env", "/bin/bash", "-c"]
+
+# Copie le reste du code backend
 COPY . .
 
-# Exposer le port Flask
+# Script wait-for-it
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
 EXPOSE 5000
 
-# Commande pour lancer Flask
-CMD ["python", "app.py"]
+CMD ["conda", "run", "-n", "ocp-env", "bash", "-c", "/wait-for-it.sh db:5432 -- flask init-db && flask run --host=0.0.0.0 --port=5000"]

@@ -4,10 +4,12 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
 from database import get_db_connection, init_db
+
+
 from optimization import calculate_formulation
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}})
+CORS(app, resources={r"/api/*": {"origins": ["http://localhost", "http://127.0.0.1"]}})
 
 # ------------------- CLI -------------------
 import click

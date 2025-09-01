@@ -42,8 +42,8 @@
                                 <div class="card flex justify-center p-4 border-round border-1 surface-border">
                                     <div class="w-56">
                                         <label class="block text-sm font-medium mb-2">Azote (N)</label>
-                                        <InputText v-model.number="N" class="w-full mb-4" />
-                                        <Slider v-model="N" class="w-full" />
+                                        <InputText v-model.number="n" class="w-full mb-4" />
+                                        <Slider v-model="n" class="w-full" />
                                     </div>
                                 </div>
 
@@ -51,8 +51,8 @@
                                 <div class="card flex justify-center p-4 border-round border-1 surface-border">
                                     <div class="w-56">
                                         <label class="block text-sm font-medium mb-2">Phosphate (P₂O₅)</label>
-                                        <InputText v-model.number="K2O5" class="w-full mb-4" />
-                                        <Slider v-model="K2O5" class="w-full" />
+                                        <InputText v-model.number="k2o5" class="w-full mb-4" />
+                                        <Slider v-model="k2o5" class="w-full" />
                                     </div>
                                 </div>
 
@@ -60,8 +60,8 @@
                                 <div class="card flex justify-center p-4 border-round border-1 surface-border">
                                     <div class="w-56">
                                         <label class="block text-sm font-medium mb-2">Potasse (K₂O)</label>
-                                        <InputText v-model.number="K2O" class="w-full mb-4" />
-                                        <Slider v-model="K2O" class="w-full" />
+                                        <InputText v-model.number="k2o" class="w-full mb-4" />
+                                        <Slider v-model="k2o" class="w-full" />
                                     </div>
                                 </div>
 
@@ -69,8 +69,8 @@
                                 <div class="card flex justify-center p-4 border-round border-1 surface-border">
                                     <div class="w-56">
                                         <label class="block text-sm font-medium mb-2">Soufre (S)</label>
-                                        <InputText v-model.number="S" class="w-full mb-4" />
-                                        <Slider v-model="S" class="w-full" />
+                                        <InputText v-model.number="s" class="w-full mb-4" />
+                                        <Slider v-model="s" class="w-full" />
                                     </div>
                                 </div>
                             </div>
@@ -252,14 +252,17 @@ import { ref, watch, onMounted } from "vue";
 import axios from "axios";
 import Chart from 'primevue/chart';
 
+
+const API_URL = import.meta.env.VITE_API_URL;
+
 const choix = ref('NPK');
 const options = ref(['NPK', 'NPK-S']);
 const getPageId = (options) => (options === "NPK" ? 1 : 2);
 
-const K2O5 = ref(50);
-const N = ref(50);
-const K2O = ref(50);
-const S = ref(50);
+const k2o5 = ref(50);
+const n = ref(50);
+const k2o = ref(50);
+const s = ref(50);
 
 const ingredients = ref([]);
 const selectedProducts = ref([]);
@@ -274,7 +277,7 @@ const chartOptions = ref();
 // Chargement initial des ingrédients
 onMounted(async () => {
   try {
-    const response = await axios.get("http://localhost:5000/api/ingredients", {
+    const response = await axios.get(`${API_URL}/api/ingredients`, {
       params: { page_id: getPageId(choix.value) },
     });
     ingredients.value = response.data;
@@ -286,7 +289,7 @@ onMounted(async () => {
 // Recharger les ingrédients quand le choix change
 watch(choix, async (newValue) => {
   try {
-    const response = await axios.get("http://localhost:5000/api/ingredients", {
+    const response = await axios.get(`${API_URL}/api/ingredients`, {
       params: { page_id: getPageId(newValue) },
     });
     ingredients.value = response.data;
@@ -313,17 +316,17 @@ const calculateOptimization = async () => {
     try {
         const requestData = {
             target: {
-                N: parseFloat(N.value),
-                P2O5: parseFloat(K2O5.value),
-                K2O: parseFloat(K2O.value),
-                S: parseFloat(S.value)
+                n: parseFloat(n.value),
+                p2o5: parseFloat(k2o5.value),
+                k2o: parseFloat(k2o.value),
+                s: parseFloat(s.value)
             },
             available_ingredients: selectedProducts.value.map(p => p.id)
         };
 
         console.log("Envoi des données au backend:", requestData);
         
-        const response = await axios.post("http://localhost:5000/api/calculate", requestData);
+        const response = await axios.post(`${API_URL}/api/calculate`, requestData);
         resultData.value = response.data;
         console.log("Réponse reçue:", resultData.value);
         
@@ -359,7 +362,7 @@ const updateChart = () => {
     const documentStyle = getComputedStyle(document.documentElement);
     
     chartData.value = {
-        labels: ['N', 'P₂O₅', 'K₂O', 'S'],
+        labels: ['n', 'p₂o₅', 'k₂o', 's'],
         datasets: [
             {
                 label: 'Objectif',
